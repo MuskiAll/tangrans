@@ -68,35 +68,50 @@
         // Defina as dimensões e posição de cada peça
         Object.assign(piece.style, pieces[i]);
         
-        // Adicionando interatividade para redimensionar as peças
+        // Adicionando interatividade para redimensionar e mover as peças
         let isResizing = false;
-        let startX, startY, startWidth, startHeight;
+        let isMoving = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
         
         piece.addEventListener('mousedown', (event) => {
           event.preventDefault();
-          isResizing = true;
-          startX = event.clientX;
-          startY = event.clientY;
-          startWidth = parseInt(window.getComputedStyle(piece).width, 10);
-          startHeight = parseInt(window.getComputedStyle(piece).height, 10);
-          window.addEventListener('mousemove', resizePiece);
-          window.addEventListener('mouseup', stopResizing);
+          const targetClassList = event.target.classList;
+          if (targetClassList.contains('tangram-piece')) {
+            isMoving = true;
+            startX = event.clientX;
+            startY = event.clientY;
+            startLeft = parseInt(window.getComputedStyle(piece).left, 10);
+            startTop = parseInt(window.getComputedStyle(piece).top, 10);
+          } else if (targetClassList.contains('resize-handle')) {
+            isResizing = true;
+            startX = event.clientX;
+            startY = event.clientY;
+            startWidth = parseInt(window.getComputedStyle(piece).width, 10);
+            startHeight = parseInt(window.getComputedStyle(piece).height, 10);
+          }
+          window.addEventListener('mousemove', resizeAndMovePiece);
+          window.addEventListener('mouseup', stopResizingAndMoving);
         });
         
-        function resizePiece(event) {
-          if (!isResizing) return;
-          
-          const deltaX = event.clientX - startX;
-          const deltaY = event.clientY - startY;
-          
-          piece.style.width = startWidth + deltaX + 'px';
-          piece.style.height = startHeight + deltaY + 'px';
+        function resizeAndMovePiece(event) {
+          if (isMoving) {
+            const deltaX = event.clientX - startX;
+            const deltaY = event.clientY - startY;
+            piece.style.left = startLeft + deltaX + 'px';
+            piece.style.top = startTop + deltaY + 'px';
+          } else if (isResizing) {
+            const deltaX = event.clientX - startX;
+            const deltaY = event.clientY - startY;
+            piece.style.width = startWidth + deltaX + 'px';
+            piece.style.height = startHeight + deltaY + 'px';
+          }
         }
         
-        function stopResizing() {
+        function stopResizingAndMoving() {
           isResizing = false;
-          window.removeEventListener('mousemove', resizePiece);
-          window.removeEventListener('mouseup', stopResizing);
+          isMoving = false;
+          window.removeEventListener('mousemove', resizeAndMovePiece);
+          window.removeEventListener('mouseup', stopResizingAndMoving);
         }
         
         board.appendChild(piece);
@@ -120,35 +135,50 @@
       piece.style.left = left;
       piece.style.backgroundColor = color;
       
-      // Adicionando interatividade para redimensionar as peças
+      // Adicionando interatividade para redimensionar e mover as peças
       let isResizing = false;
-      let startX, startY, startWidth, startHeight;
+      let isMoving = false;
+      let startX, startY, startWidth, startHeight, startLeft, startTop;
       
       piece.addEventListener('mousedown', (event) => {
         event.preventDefault();
-        isResizing = true;
-        startX = event.clientX;
-        startY = event.clientY;
-        startWidth = parseInt(window.getComputedStyle(piece).width, 10);
-        startHeight = parseInt(window.getComputedStyle(piece).height, 10);
-        window.addEventListener('mousemove', resizePiece);
-        window.addEventListener('mouseup', stopResizing);
+        const targetClassList = event.target.classList;
+        if (targetClassList.contains('tangram-piece')) {
+          isMoving = true;
+          startX = event.clientX;
+          startY = event.clientY;
+          startLeft = parseInt(window.getComputedStyle(piece).left, 10);
+          startTop = parseInt(window.getComputedStyle(piece).top, 10);
+        } else if (targetClassList.contains('resize-handle')) {
+          isResizing = true;
+          startX = event.clientX;
+          startY = event.clientY;
+          startWidth = parseInt(window.getComputedStyle(piece).width, 10);
+          startHeight = parseInt(window.getComputedStyle(piece).height, 10);
+        }
+        window.addEventListener('mousemove', resizeAndMovePiece);
+        window.addEventListener('mouseup', stopResizingAndMoving);
       });
       
-      function resizePiece(event) {
-        if (!isResizing) return;
-        
-        const deltaX = event.clientX - startX;
-        const deltaY = event.clientY - startY;
-        
-        piece.style.width = startWidth + deltaX + 'px';
-        piece.style.height = startHeight + deltaY + 'px';
+      function resizeAndMovePiece(event) {
+        if (isMoving) {
+          const deltaX = event.clientX - startX;
+          const deltaY = event.clientY - startY;
+          piece.style.left = startLeft + deltaX + 'px';
+          piece.style.top = startTop + deltaY + 'px';
+        } else if (isResizing) {
+          const deltaX = event.clientX - startX;
+          const deltaY = event.clientY - startY;
+          piece.style.width = startWidth + deltaX + 'px';
+          piece.style.height = startHeight + deltaY + 'px';
+        }
       }
       
-      function stopResizing() {
+      function stopResizingAndMoving() {
         isResizing = false;
-        window.removeEventListener('mousemove', resizePiece);
-        window.removeEventListener('mouseup', stopResizing);
+        isMoving = false;
+        window.removeEventListener('mousemove', resizeAndMovePiece);
+        window.removeEventListener('mouseup', stopResizingAndMoving);
       }
       
       board.appendChild(piece);
