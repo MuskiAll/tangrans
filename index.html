@@ -17,12 +17,34 @@
       border: 2px solid #000;
       cursor: grab;
     }
+    .form-container {
+      margin-top: 20px;
+    }
+    .form-container input {
+      margin-right: 10px;
+    }
+    .form-container button {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>Criador de Tangrans</h1>
   <div class="tangram-board">
     <!-- Aqui serão adicionadas as peças do tangram -->
+  </div>
+  <div class="form-container">
+    <label for="width-input">Largura:</label>
+    <input type="number" id="width-input">
+    <label for="height-input">Altura:</label>
+    <input type="number" id="height-input">
+    <label for="top-input">Posição Superior:</label>
+    <input type="number" id="top-input">
+    <label for="left-input">Posição Esquerda:</label>
+    <input type="number" id="left-input">
+    <label for="color-input">Cor:</label>
+    <input type="color" id="color-input">
+    <button onclick="addCustomPiece()">Adicionar Peça Personalizada</button>
   </div>
   <script>
     // Função para criar as peças do tangram
@@ -31,15 +53,20 @@
       const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#000000'];
       
       // Criando as sete peças do tangram
-      for (let i = 0; i < 7; i++) {
+      const pieces = [
+        { width: '200px', height: '200px', top: '0px', left: '0px' },
+        { width: '200px', height: '200px', top: '0px', right: '0px' },
+        { width: '200px', height: '200px', bottom: '0px', left: '0px' },
+        // Adicione mais formas personalizadas aqui
+      ];
+      
+      for (let i = 0; i < pieces.length; i++) {
         const piece = document.createElement('div');
         piece.classList.add('tangram-piece');
         piece.style.backgroundColor = colors[i];
-        // Defina as dimensões e posição inicial de cada peça
-        piece.style.width = '100px';
-        piece.style.height = '100px';
-        piece.style.top = '100px';
-        piece.style.left = '100px';
+        
+        // Defina as dimensões e posição de cada peça
+        Object.assign(piece.style, pieces[i]);
         
         // Adicionando interatividade para redimensionar as peças
         let isResizing = false;
@@ -74,6 +101,57 @@
         
         board.appendChild(piece);
       }
+    }
+    
+    // Função para adicionar uma peça personalizada
+    function addCustomPiece() {
+      const board = document.querySelector('.tangram-board');
+      const width = document.getElementById('width-input').value + 'px';
+      const height = document.getElementById('height-input').value + 'px';
+      const top = document.getElementById('top-input').value + 'px';
+      const left = document.getElementById('left-input').value + 'px';
+      const color = document.getElementById('color-input').value;
+      
+      const piece = document.createElement('div');
+      piece.classList.add('tangram-piece');
+      piece.style.width = width;
+      piece.style.height = height;
+      piece.style.top = top;
+      piece.style.left = left;
+      piece.style.backgroundColor = color;
+      
+      // Adicionando interatividade para redimensionar as peças
+      let isResizing = false;
+      let startX, startY, startWidth, startHeight;
+      
+      piece.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        isResizing = true;
+        startX = event.clientX;
+        startY = event.clientY;
+        startWidth = parseInt(window.getComputedStyle(piece).width, 10);
+        startHeight = parseInt(window.getComputedStyle(piece).height, 10);
+        window.addEventListener('mousemove', resizePiece);
+        window.addEventListener('mouseup', stopResizing);
+      });
+      
+      function resizePiece(event) {
+        if (!isResizing) return;
+        
+        const deltaX = event.clientX - startX;
+        const deltaY = event.clientY - startY;
+        
+        piece.style.width = startWidth + deltaX + 'px';
+        piece.style.height = startHeight + deltaY + 'px';
+      }
+      
+      function stopResizing() {
+        isResizing = false;
+        window.removeEventListener('mousemove', resizePiece);
+        window.removeEventListener('mouseup', stopResizing);
+      }
+      
+      board.appendChild(piece);
     }
     
     // Chamando a função para criar as peças do tangram quando a página carregar
